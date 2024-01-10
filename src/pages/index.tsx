@@ -1,12 +1,12 @@
 import Image from "next/image";
 import styles from "./index.module.css";
 import axios from "axios";
-import { ethers } from "ethers";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { getWebAuthnAttestation, TurnkeyClient } from "@turnkey/http";
 import { WebauthnStamper } from "@turnkey/webauthn-stamper";
 import { TurnkeySigner } from "@turnkey/ethers";
+import { TWalletDetails } from "../types";
 
 type subOrgFormData = {
   subOrgName: string;
@@ -44,11 +44,14 @@ type TSignedMessage = {
   signature: string;
 } | null;
 
+type TWalletState = TWalletDetails | null;
+
 const humanReadableDateTime = (): string => {
   return new Date().toLocaleString().replaceAll("/", "-").replaceAll(":", ".");
 };
 
 export default function Home() {
+  const [wallet, setWallet] = useState<TWalletState>(null);
   const [subOrgId, setSubOrgId] = useState<string | null>(null);
   const [privateKey, setPrivateKey] = useState<TPrivateKeyState>(null);
   const [signedMessage, setSignedMessage] = useState<TSignedMessage>(null);
@@ -56,7 +59,6 @@ export default function Home() {
   const { handleSubmit: subOrgFormSubmit } = useForm<subOrgFormData>();
   const { register: signingFormRegister, handleSubmit: signingFormSubmit } =
     useForm<signingFormData>();
-  const { handleSubmit: privateKeyFormSubmit } = useForm<privateKeyFormData>();
   const { register: _loginFormRegister, handleSubmit: loginFormSubmit } =
     useForm();
 
@@ -71,46 +73,18 @@ export default function Home() {
     stamper
   );
 
-  const createPrivateKey = async () => {
-    if (!subOrgId) {
-      throw new Error("sub-org id not found");
-    }
-
-    const signedRequest = await passkeyHttpClient.stampCreatePrivateKeys({
-      type: "ACTIVITY_TYPE_CREATE_PRIVATE_KEYS_V2",
-      organizationId: subOrgId,
-      timestampMs: String(Date.now()),
-      parameters: {
-        privateKeys: [
-          {
-            privateKeyName: `ETH Key ${Math.floor(Math.random() * 1000)}`,
-            curve: "CURVE_SECP256K1",
-            addressFormats: ["ADDRESS_FORMAT_ETHEREUM"],
-            privateKeyTags: [],
-          },
-        ],
-      },
-    });
-
-    const response = await axios.post("/api/createKey", signedRequest);
-
-    setPrivateKey({
-      id: response.data["privateKeyId"],
-      address: response.data["address"],
-    });
-  };
-
   const signMessage = async (data: signingFormData) => {
-    if (!subOrgId || !privateKey) {
+    if (!wallet) {
       throw new Error("sub-org id or private key not found");
     }
 
     const ethersSigner = new TurnkeySigner({
       client: passkeyHttpClient,
-      organizationId: subOrgId,
-      privateKeyId: privateKey.id,
+      organizationId: wallet.subOrgId,
+      signWith: wallet.address,
     });
 
+    
     const signedMessage = await ethersSigner.signMessage(data.messageToSign);
 
     setSignedMessage({
@@ -119,7 +93,8 @@ export default function Home() {
     });
   };
 
-  const createSubOrg = async () => {
+
+  const createSubOrgAndWallet = async () => {
     const challenge = generateRandomBuffer();
     const subOrgName = `Turnkey Ethers+Passkey Demo - ${humanReadableDateTime()}`;
     const authenticatorUserId = generateRandomBuffer();
@@ -134,9 +109,11 @@ export default function Home() {
         pubKeyCredParams: [
           {
             type: "public-key",
-            // All algorithms can be found here: https://www.iana.org/assignments/cose/cose.xhtml#algorithms
-            // Turnkey only supports ES256 at the moment.
             alg: -7,
+          },
+          {
+            type: "public-key",
+            alg: -257,
           },
         ],
         user: {
@@ -153,18 +130,35 @@ export default function Home() {
       challenge: base64UrlEncode(challenge),
     });
 
-    setSubOrgId(res.data.subOrgId);
+    const response = res.data as TWalletDetails;
+    console.log(response)
+    setWallet(response);
   };
 
+
   const login = async () => {
-    // We use the parent org ID, which we know at all times,
-    const res = await passkeyHttpClient.getWhoami({
-      organizationId: process.env.NEXT_PUBLIC_ORGANIZATION_ID!,
-    });
-    // to get the sub-org ID, which we don't know at this point because we don't
-    // have a DB. Note that we are able to perform this lookup by using the
-    // credential ID from the users WebAuthn stamp.
-    setSubOrgId(res.organizationId);
+    try {
+      // We use the parent org ID, which we know at all times...
+      const signedRequest = await passkeyHttpClient.stampGetWhoami({
+        organizationId: process.env.NEXT_PUBLIC_ORGANIZATION_ID!,
+      });
+      // ...to get the sub-org ID, which we don't know at this point because we don't
+      // have a DB. Note that we are able to perform this lookup by using the
+      // credential ID from the users WebAuthn stamp.
+      // In our login endpoint we also fetch wallet details after we get the sub-org ID
+      // (our backend API key can do this: parent orgs have read-only access to their sub-orgs)
+      const res = await axios.post("/api/login", signedRequest);
+      if (res.status !== 200) {
+        throw new Error(`error while logging in (${res.status}): ${res.data}`);
+      }
+
+      const response = res.data as TWalletDetails;
+      setWallet(response);
+    } catch (e: any) {
+      const message = `caught error: ${e.toString()}`;
+      console.error(message);
+      alert(message);
+    }
   };
 
   return (
@@ -180,16 +174,16 @@ export default function Home() {
         />
       </a>
       <div>
-        {subOrgId && (
+        {wallet !== null && (
           <div className={styles.info}>
             Your sub-org ID: <br />
-            <span className={styles.code}>{subOrgId}</span>
+            <span className={styles.code}>{wallet.subOrgId}</span>
           </div>
         )}
-        {privateKey && (
+        {wallet && (
           <div className={styles.info}>
             ETH address: <br />
-            <span className={styles.code}>{privateKey.address}</span>
+            <span className={styles.code}>{wallet.address}</span>
           </div>
         )}
         {signedMessage && (
@@ -212,9 +206,9 @@ export default function Home() {
           </div>
         )}
       </div>
-      {!subOrgId && (
+      {!wallet && (
         <div>
-          <h2>First, create a new sub-organization</h2>
+          <h2>Create a new wallet</h2>
           <p className={styles.explainer}>
             We&apos;ll prompt your browser to create a new passkey. The details
             (credential ID, authenticator data, client data, attestation) will
@@ -226,7 +220,14 @@ export default function Home() {
             >
               Turnkey Sub-Organization
             </a>
-            .
+            {" "}and a new{" "}
+            <a
+              href="https://docs.turnkey.com/getting-started/wallets"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+            Wallet
+            </a> within it.
             <br />
             <br />
             This request to Turnkey will be created and signed by the backend
@@ -234,21 +235,21 @@ export default function Home() {
           </p>
           <form
             className={styles.form}
-            onSubmit={subOrgFormSubmit(createSubOrg)}
+            onSubmit={subOrgFormSubmit(createSubOrgAndWallet)}
           >
             <input
               className={styles.button}
               type="submit"
-              value="Create new passkey & sub-org"
+              value="Create new wallet"
             />
           </form>
           <br />
           <br />
-          <h2>Already created a sub-organization? Log back in</h2>
+          <h2>Already created your wallet? Log back in</h2>
           <p className={styles.explainer}>
             Based on the parent organization ID and a stamp from your passkey
-            used to created the sub-organization, we can look up your
-            sug-organization using the{" "}
+            used to created the sub-organization and wallet, we can look up your
+            sub-organization using the{" "}
             <a
               href="https://docs.turnkey.com/api#tag/Who-am-I"
               target="_blank"
@@ -266,38 +267,7 @@ export default function Home() {
           </form>
         </div>
       )}
-      {subOrgId && !privateKey && (
-        <div>
-          <h2>Next, create a new Ethereum address using your passkey </h2>
-          <p className={styles.explainer}>
-            We will sign the key creation request (
-            <a
-              href="https://docs.turnkey.com/api#tag/Private-Keys/operation/PublicApiService_CreatePrivateKeys"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              /public/v1/submit/create_private_keys
-            </a>
-            ) with your passkey, and forward it to Turnkey through the NextJS
-            backend.
-            <br />
-            <br />
-            This ensures we can safely poll for activity completion and handle
-            errors.
-          </p>
-          <form
-            className={styles.form}
-            onSubmit={privateKeyFormSubmit(createPrivateKey)}
-          >
-            <input
-              className={styles.button}
-              type="submit"
-              value="Create ETH address"
-            />
-          </form>
-        </div>
-      )}
-      {subOrgId && privateKey && (
+      {wallet !== null &&  (
         <div>
           <h2>Now let&apos;s sign something!</h2>
           <p className={styles.explainer}>
