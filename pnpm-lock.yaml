@@ -1,18 +1,22 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@turnkey/api-key-stamper':
-    specifier: ^0.1.1
-    version: 0.1.1
+    specifier: 0.3.0
+    version: 0.3.0
   '@turnkey/ethers':
-    specifier: ^0.17.1
-    version: 0.17.1(encoding@0.1.13)(ethers@5.7.2)
+    specifier: ^0.19.7
+    version: 0.19.7(encoding@0.1.13)(ethers@5.7.2)
   '@turnkey/http':
-    specifier: ^1.2.0
-    version: 1.2.0(encoding@0.1.13)
+    specifier: 2.4.2
+    version: 2.4.2(encoding@0.1.13)
   '@turnkey/webauthn-stamper':
-    specifier: ^0.1.0
-    version: 0.1.0
+    specifier: 0.4.2
+    version: 0.4.2
   '@types/node':
     specifier: 20.3.1
     version: 20.3.1
@@ -539,6 +543,11 @@ packages:
     dev: false
     optional: true
 
+  /@noble/hashes@1.3.3:
+    resolution: {integrity: sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==}
+    engines: {node: '>= 16'}
+    dev: false
+
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -570,39 +579,66 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /@turnkey/api-key-stamper@0.1.1:
-    resolution: {integrity: sha512-qs8fmWFiAhh7fAByx7j9/2F0VRe/qD7Yq3hi4FwD+jLU0CXdE+aim1cmJpAFFPKF1PBmPs6jh4XBODE40eqEEg==}
+  /@turnkey/api-key-stamper@0.3.0:
+    resolution: {integrity: sha512-R3Iwt+y8pbpnDkKaIqURAKxtIG3ipeD42ravMtY6DnewMr+d/JhUwtl8IDHFrNw63bQjWwGwN8bhNqhRdH2VxA==}
     engines: {node: '>=16.0.0'}
     dev: false
 
-  /@turnkey/ethers@0.17.1(encoding@0.1.13)(ethers@5.7.2):
-    resolution: {integrity: sha512-pW/TUVRkPqWzrGApPWERtrWxV9BHZpAvoL1oZk/P2NZfoN51bB1n+NwWo36kJ1BRuH3l4l6sC8JcpXlifIWkDw==}
-    engines: {node: '>=16.0.0'}
+  /@turnkey/api-key-stamper@0.3.1:
+    resolution: {integrity: sha512-aPeBkz5MgUjsgl+lf7Kz7g4CM+DR9w+G1bV6Zl4mNxTgR37VbEmQ/G/UrbYu7/M0bTVzHWIDm5vuzwc8cfaQ2w==}
+    engines: {node: '>=18.0.0'}
+    dev: false
+
+  /@turnkey/ethers@0.19.7(encoding@0.1.13)(ethers@5.7.2):
+    resolution: {integrity: sha512-6S0zD9GiT6pBuPU2IxDoBuWhEeT7aqh3z3JCXKQ7xMvYLNOS8tguO/Q21fEqymrJvui12PLpeTfw2/feXpvY6g==}
+    engines: {node: '>=18.0.0'}
     peerDependencies:
       ethers: ^5.0.0
     dependencies:
       '@ethersproject/abstract-signer': 5.7.0
-      '@turnkey/api-key-stamper': 0.1.1
-      '@turnkey/http': 1.2.0(encoding@0.1.13)
+      '@turnkey/api-key-stamper': 0.3.1
+      '@turnkey/http': 2.6.2(encoding@0.1.13)
       ethers: 5.7.2
     transitivePeerDependencies:
       - encoding
     dev: false
 
-  /@turnkey/http@1.2.0(encoding@0.1.13):
-    resolution: {integrity: sha512-76om6RBWI705sgV1onENp2m70PAISmUcCfEHVmwMRGyt7X2Y2qpwTrEoDFqX9qPrY99qLEZbkcJVZDwMNudnzQ==}
+  /@turnkey/http@2.4.2(encoding@0.1.13):
+    resolution: {integrity: sha512-7DKjzL2N8FWJyHJOASVWubRfeZY4iKKZtuD3n6FpJWg1bfmTdCcLG8HlLcySfWOpvPcZTqMdpITRry4BAKN7ww==}
     engines: {node: '>=16.0.0'}
     dependencies:
-      '@turnkey/api-key-stamper': 0.1.1
-      '@turnkey/webauthn-stamper': 0.1.0
+      '@turnkey/api-key-stamper': 0.3.0
+      '@turnkey/webauthn-stamper': 0.4.2
       cross-fetch: 3.1.8(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
     dev: false
 
-  /@turnkey/webauthn-stamper@0.1.0:
-    resolution: {integrity: sha512-o3ostyv+xVAMn0CGeQLsPFo9InX99+5Qa25QiyvOWGFQXPvkcQoFX9LUg49vu/0juQKZ6cuFTzPjWWlmHSS/yA==}
+  /@turnkey/http@2.6.2(encoding@0.1.13):
+    resolution: {integrity: sha512-0ZO0ZWc0O7pRJUES/uKGO11aoArcNLArxeHwycMFxY/2AA5QZP96IPwGxOjYeqYKtGHE0uCXgwP3ucxmln8hZg==}
     engines: {node: '>=16.0.0'}
+    dependencies:
+      '@turnkey/api-key-stamper': 0.3.1
+      '@turnkey/webauthn-stamper': 0.4.3
+      cross-fetch: 3.1.8(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@turnkey/webauthn-stamper@0.4.2:
+    resolution: {integrity: sha512-rf8pl7VBR24ycNg6UzmNBI88zmMK+oAPui3aj8vTQJWqdsFi5wUdGHWqDwG3c8Iz+uIppRTkp21ftAOGVVqLAg==}
+    engines: {node: '>=16.0.0'}
+    dependencies:
+      '@noble/hashes': 1.3.3
+      buffer: 6.0.3
+    dev: false
+
+  /@turnkey/webauthn-stamper@0.4.3:
+    resolution: {integrity: sha512-hJuIpwny44TOrkFJiK8uA29RRO1A9xJK3KbN4PWqBxTLh1r7ntkl3zslc/qAkgnw6f+OREQbhQGoYkTdIX+7QA==}
+    engines: {node: '>=18.0.0'}
+    dependencies:
+      '@noble/hashes': 1.3.3
+      buffer: 6.0.3
     dev: false
 
   /@types/json5@0.0.29:
@@ -867,6 +903,10 @@ packages:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: false
 
+  /base64-js@1.5.1:
+    resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+    dev: false
+
   /bech32@1.1.4:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
     dev: false
@@ -895,6 +935,13 @@ packages:
 
   /brorand@1.1.0:
     resolution: {integrity: sha512-cKV8tMCEpQs4hK/ik71d6LrPOnpkpGBR0wzxqr68g2m/LB2GxVYQroAjMJZRVM1Y4BCjCKc3vAamxSzOY2RP+w==}
+    dev: false
+
+  /buffer@6.0.3:
+    resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
+    dependencies:
+      base64-js: 1.5.1
+      ieee754: 1.2.1
     dev: false
 
   /busboy@1.6.0:
@@ -1768,6 +1815,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       safer-buffer: 2.1.2
+    dev: false
+
+  /ieee754@1.2.1:
+    resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
     dev: false
 
   /ignore@5.2.4:
