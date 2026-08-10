@@ -1,5 +1,22 @@
 # Demo Ethers 🤝 Passkeys
 
+> [!WARNING]
+> **This demo is deprecated and no longer maintained. Please do not use it as a starting point.**
+>
+> It uses [`@turnkey/sdk-react`](https://www.npmjs.com/package/@turnkey/sdk-react) and
+> [`@turnkey/sdk-browser`](https://www.npmjs.com/package/@turnkey/sdk-browser), which are deprecated in favor
+> of [`@turnkey/react-wallet-kit`](https://www.npmjs.com/package/@turnkey/react-wallet-kit) — or
+> [`@turnkey/core`](https://www.npmjs.com/package/@turnkey/core) if you aren't using React.
+>
+> **Use one of these instead:**
+>
+> | If you want | Use this |
+> | --- | --- |
+> | Passkey sign-up and login with a backend that creates sub-organizations | [`examples/authentication/with-passkeys`](https://github.com/tkhq/sdk/tree/main/examples/authentication/with-passkeys) |
+> | ethers specifically | [`@turnkey/ethers`](https://github.com/tkhq/sdk/tree/main/packages/ethers) with [`examples/chain-integrations/with-ethers`](https://github.com/tkhq/sdk/tree/main/examples/chain-integrations/with-ethers) |
+>
+> See the [SDK repo](https://github.com/tkhq/sdk) and [docs](https://docs.turnkey.com).
+
 This repo contains a sample application **for demonstration purposes only**, walking through how to create sub-organizations, create private keys, and sign with the [`@turnkey/ethers`](https://github.com/tkhq/sdk/tree/main/packages/ethers) signer, using passkeys. Please feel free to clone or fork this repo, or file an issue if there are improvements to be made! ❤️
 
 ![UI screenshot](./img/ui-screenshot.png)
